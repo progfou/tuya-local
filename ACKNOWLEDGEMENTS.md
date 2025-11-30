@@ -1140,3 +1140,4 @@ Further device support has been made with the assistance of users. Please consid
 - [fredppm](https://github.com/fredppm) for contributing support for Newpet pet feeder.
 - [politician](https://github.com/politician) for assisting with support for Kerui 120dB siren alarm.
 - [gooner1990](https://github.com/gooner1990) for assisting with support for Rinnai Enviroflo heat pump water heater.
+- [progfou](https://github.com/progfou) for contributing support for Oneisall PFD-002 PRO IR pet feeder.

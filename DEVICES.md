@@ -999,6 +999,7 @@ port and password.
 - Nedis pet feeder
 - Newpet pet feeder
 - Ningbo BF314A camera pet feeder
+- Oneisall PFD-002 PRO IR pet feeder
 - Papifeed pet feeder
 - Petempo PAF-02 pet feeder
 - Petlibro PLAF103 pet feeder

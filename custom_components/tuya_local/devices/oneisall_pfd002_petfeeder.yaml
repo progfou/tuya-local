@@ -1,27 +1,38 @@
+# inspired from work on Newpet DR Feeder by fredppm and make-all (commit c7a1be0)
 name: Pet feeder
 products:
   - id: ebdq15yidek4phti
     manufacturer: Oneisall
     model: PFD-002 PRO IR
 entities:
-  #- entity: sensor
-  #  category: diagnostic
-  #  name: Meal Plan
-  #  dps:
-  #    - id: 1
-  #      type: raw???
-  - entity: button
-    icon: "mdi:food-drumstick"
-    name: Quick feed
+  - entity: text
+    name: Meal Plan
+    category: config
     dps:
-      - id: 2
-        type: boolean
-        name: button
+      # Meal plan is the following binary blob (1 byte per line), encoded
+      # in base64:
+      # - Date (1 bit per day Monday -> Sunday, padded with 0 on the MSB).
+      #    Ex: Monday, Wednesday, Sunday -> 0b01010001
+      # - Hour
+      # - Minute
+      # - Feed number
+      # - Enable/Disabled
+      - id: 1
+        type: base64
+        name: value
         optional: true
+  #- entity: button
+  #  icon: "mdi:food-drumstick"
+  #  name: Quick feed
+  #  dps:
+  #    - id: 2
+  #      type: boolean
+  #      name: button
+  #      optional: true
   - entity: number
     name: Manual feed
-    category: config
-    icon: "mdi:paw"
+    icon: "mdi:food-drumstick"
+    #category: config
     dps:
       - id: 3
         type: integer
@@ -32,14 +43,14 @@ entities:
           max: 60
         optional: true
   - entity: sensor
-    category: diagnostic
-    name: Feed state
-    icon: "mdi:valve"
     class: enum
+    #name: Feed state
+    translation_key: status
+    category: diagnostic
     dps:
       - id: 4
-        name: sensor
         type: string
+        name: sensor
         mapping:
           - dps_val: standby
             value: Standby
@@ -47,47 +58,57 @@ entities:
             value: Feeding
           - dps_val: done
             value: Done
-  - entity: sensor
-    name: Battery power
-    class: battery
-    category: diagnostic
-    dps:
-      - id: 10
-        type: integer
-        name: sensor
-        unit: "%"
-        range:
-          min: 0
-          max: 100
-        class: measurement
-        optional: true
-  - entity: sensor
-    name: Charge state
-    dps:
-      - id: 11
-        type: boolean
-        name: sensor
-        optional: true
-  - entity: sensor
-    name: Cover state
-    dps:
-      - id: 12
-        type: string
-        name: sensor
-        mapping:
-          - dps_val: "on"
-            value: "On"
-          - dps_val: "off"
-            value: "Off"
-        optional: true
+  #- entity: sensor
+  #  class: battery
+  #  name: Battery power
+  #  category: diagnostic
+  #  dps:
+  #    - id: 10
+  #      type: integer
+  #      name: sensor
+  #      unit: "%"
+  #      range:
+  #        min: 0
+  #        max: 100
+  #      class: measurement
+  #      optional: true
+  #- entity: sensor
+  #  name: Charge state
+  #  dps:
+  #    - id: 11
+  #      type: boolean
+  #      name: sensor
+  #      optional: true
+  #- entity: sensor
+  #  name: Cover state
+  #  dps:
+  #    - id: 12
+  #      type: string
+  #      name: sensor
+  #      mapping:
+  #        - dps_val: "on"
+  #          value: "On"
+  #        - dps_val: "off"
+  #          value: "Off"
+  #      optional: true
   - entity: binary_sensor
-    name: Fault alarm
     class: problem
+    #name: Fault alarm
     category: diagnostic
     dps:
       - id: 13
         type: bitfield
         name: sensor
+        mapping:
+          - dps_val: 0
+            value: false
+          - value: true
+      - id: 13
+        type: bitfield
+        name: fault_code
+      - id: 13
+        type: bitfield
+        name: description
         mapping:
           - dps_val: 0
             value: ok
@@ -105,23 +126,27 @@ entities:
             value: device_stuck
           - dps_val: 64
             value: bat_powered
-  - entity: sensor
+  - entity: event
+    icon: "mdi:paw"
     name: Feed result report
     category: diagnostic
     dps:
       - id: 14
         type: integer
-        name: sensor
-        unit: "%"
-        range:
-          min: 0
-          max: 100
-        class: measurement
+        name: event
+        optional: true
+        mapping:
+          - dps_val: null
+            value: null
+          - value: fed
+      - id: 14
+        type: integer
+        name: portions
         optional: true
   - entity: switch
-    name: Status indicator light
+    name: Front panel light
     category: config
-    icon: "mdi:light"
+    icon: "mdi:lightbulb"
     dps:
       - id: 17
         type: boolean
@@ -134,13 +159,16 @@ entities:
       - id: 23
         type: boolean
         name: switch
-  - entity: switch
-    name: Factory reset
+  - entity: button
+    #name: Factory reset
+    translation_key: factory_reset
     category: config
+    hidden: true
     dps:
       - id: 24
         type: boolean
-        name: switch
+        name: button
+        optional: true
   - entity: switch
     name: Low food alert
     category: config
@@ -149,13 +177,13 @@ entities:
         type: boolean
         name: switch
   - entity: sensor
-    category: diagnostic
-    name: Power supply mode
     class: enum
+    name: Power supply mode
+    category: diagnostic
     dps:
       - id: 101
-        name: sensor
         type: string
+        name: sensor
         mapping:
           - dps_val: strong_power
             value: Main power
